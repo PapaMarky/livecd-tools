@@ -48,7 +48,7 @@ class LiveImageCreatorBase(LoopImageCreator):
 
     def __init__(self, ks, name, fslabel=None, releasever=None, tmpdir="/tmp",
                  title="Linux", product="Linux", useplugins=False, cacheonly=False,
-                 docleanup=True):
+                 docleanup=True, add_drivers=""):
         """Initialise a LiveImageCreator instance.
 
         This method takes the same arguments as LoopImageCreator.__init__().
@@ -73,6 +73,9 @@ class LiveImageCreatorBase(LoopImageCreator):
 
         self._default_kernel = kickstart.get_default_kernel(self.ks, "kernel")
         """The default kernel type from kickstart."""
+
+        self._add_drivers = add_drivers
+        """Extra kernel drivers to add to initramfs"""
 
         self.__isodir = None
 
@@ -261,7 +264,7 @@ class LiveImageCreatorBase(LoopImageCreator):
         return "vfat msdos isofs ext4 xfs btrfs squashfs";
 
     def __extra_drivers(self):
-        retval = "sr_mod sd_mod ide-cd cdrom "
+        retval = "sr_mod sd_mod ide-cd cdrom " + self._add_drivers
         for module in self.__modules:
             if module == "=usb":
                 retval = retval + "ehci_hcd uhci_hcd ohci_hcd "

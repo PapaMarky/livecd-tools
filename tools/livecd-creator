@@ -74,6 +74,10 @@ def parse_options(args):
     imgopt.add_option("", "--releasever", type="string", dest="releasever",
                       default=None,
                       help="Value to substitute for $releasever in kickstart repo urls")
+    imgopt.add_option("", "--add-drivers", type="string", dest="add_drivers",
+                      help="Add drivers to the initramfs. List of space-separated"
+                           "kernel driver names. See dracut(8) for details"
+                      default=" ")
     parser.add_option_group(imgopt)
 
     # options related to the config of your system
@@ -132,6 +136,9 @@ def parse_options(args):
             raise Usage("CD labels are limited to 32 characters")
         if options.fslabel and options.fslabel.find(" ") != -1:
             raise Usage("CD labels cannot contain spaces.")
+
+    if not options.add_drivers.endswith(" "):
+        options.add_drivers += " "
 
     return options
 
@@ -204,7 +211,8 @@ def main():
                                             useplugins=options.plugins,
                                             title=title, product=product,
                                             cacheonly=options.cacheonly,
-                                            docleanup=not options.nocleanup)
+                                            docleanup=not options.nocleanup,
+                                            add_drivers=options.add_drivers)
         elif options.image_type == 'image':
             creator = imgcreate.LoopImageCreator(ks, name,
                                             fslabel=fslabel,
